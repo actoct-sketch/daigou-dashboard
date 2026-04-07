@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>代購儀表板</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F5F2ED;
+    --surface: #FFFFFF;
+    --surface2: #EEEBE4;
+    --border: #D8D3C8;
+    --text: #1A1714;
+    --text2: #6B6560;
+    --text3: #9E9892;
+    --accent: #2D5F3F;
+    --accent-light: #EAF2EC;
+    --sold: #2D5F3F;
+    --sold-bg: #EAF2EC;
+    --self-c: #1E4A8A;
+    --self-bg: #E8EFF9;
+    --clear-c: #8A4A00;
+    --clear-bg: #FFF0DC;
+    --danger: #B83232;
+    --profit: #2D6B4A;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+  }
+  /* LAYOUT */
+  .app { display: flex; min-height: 100vh; }
+  .sidebar {
+    width: 220px;
+    background: var(--text);
+    color: #fff;
+    padding: 0;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 100;
+  }
+  .sidebar-logo {
+    padding: 24px 20px 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  .sidebar-logo .mark { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
+  .sidebar-logo h2 { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.3; }
+  .sidebar-nav { padding: 16px 12px; flex: 1; }
+  .nav-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 8px;
+    font-size: 13px; color: rgba(255,255,255,0.55);
+    cursor: pointer; margin-bottom: 2px;
+    transition: all 0.15s; font-weight: 500;
+    border: none; background: transparent; width: 100%; text-align: left;
+  }
+  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+  .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
+  .nav-icon { width: 16px; height: 16px; opacity: 0.7; flex-shrink: 0; }
+  .nav-item.active .nav-icon { opacity: 1; }
+  .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
+  .sync-info { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6; }
+  .sync-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; margin-right: 5px; }
+
+  /* MAIN */
+  .main { margin-left: 220px; flex: 1; padding: 28px 32px; max-width: 1200px; }
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; }
+  .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text); }
+  .page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+
+  /* FILTER BAR */
+  .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text2); cursor: pointer; transition: all 0.15s;
+    font-family: 'Noto Sans TC', sans-serif;
+  }
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
+
+  /* METRIC CARDS */
+  .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 24px; }
+  .metric-card {
+    background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--border); padding: 16px 18px;
+  }
+  .metric-label { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
+  .metric-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
+  .metric-value.green { color: var(--profit); }
+  .metric-value.red { color: var(--danger); }
+  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+
+  /* CARDS */
+  .card {
+    background: var(--surface); border-radius: 12px;
+    border: 1px solid var(--border); margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 18px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .card-title { font-size: 13px; font-weight: 700; color: var(--text); }
+  .card-body { padding: 18px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th {
+    text-align: left; padding: 8px 14px; font-size: 11px;
+    font-weight: 500; color: var(--text3); border-bottom: 1px solid var(--border);
+    white-space: nowrap; letter-spacing: 0.3px;
+    background: var(--surface2);
+  }
+  td { padding: 10px 14px; border-bottom: 1px solid #F0EDE8; vertical-align: middle; white-space: nowrap; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #FAFAF8; }
+  .name-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-weight: 500; }
+  .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
+  .pos { color: var(--profit); }
+  .neg { color: var(--danger); }
+
+  /* STATUS BADGES */
+  .badge {
+    display: inline-block; padding: 2px 9px; border-radius: 12px;
+    font-size: 11px; font-weight: 500; white-space: nowrap;
+  }
+  .badge-sold { background: var(--sold-bg); color: var(--sold); }
+  .badge-self { background: var(--self-bg); color: var(--self-c); }
+  .badge-clear { background: var(--clear-bg); color: var(--clear-c); }
+  .badge-pending { background: #F3E8FF; color: #6B21A8; }
+  .badge-unsold { background: #FEE2E2; color: #991B1B; }
+
+  /* SEARCH INPUT */
+  .search-wrap { position: relative; }
+  .search-input {
+    padding: 7px 12px 7px 32px; border: 1px solid var(--border);
+    border-radius: 8px; font-size: 12px; background: var(--bg);
+    color: var(--text); font-family: 'Noto Sans TC', sans-serif;
+    width: 220px; outline: none;
+    transition: border-color 0.15s;
+  }
+  .search-input:focus { border-color: var(--accent); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; }
+
+  /* CHARTS */
+  .chart-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 20px; }
+  .bar-chart-wrap { padding: 4px 0; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 120px; }
+  .chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; justify-content: flex-end; height: 100%; }
+  .chart-bar { width: 100%; border-radius: 3px 3px 0 0; transition: opacity 0.15s; cursor: pointer; }
+  .chart-bar:hover { opacity: 0.75; }
+  .chart-bar-lbl { font-size: 9px; color: var(--text3); }
+  .chart-bar-val { font-size: 9px; color: var(--text2); font-family: 'DM Mono', monospace; }
+
+  .platform-list { display: flex; flex-direction: column; gap: 10px; }
+  .platform-row { display: flex; align-items: center; gap: 10px; }
+  .platform-name { font-size: 12px; color: var(--text); width: 70px; flex-shrink: 0; }
+  .platform-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
+  .platform-bar { height: 100%; border-radius: 4px; background: var(--accent); }
+  .platform-val { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; width: 60px; text-align: right; flex-shrink: 0; }
+
+  /* INVENTORY SPECIFIC */
+  .inv-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+  .inv-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 14px 16px;
+    display: flex; align-items: center; gap: 14px;
+  }
+  .inv-stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+  .inv-stat-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .inv-stat-value { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); }
+
+  /* LOADING / ERROR */
+  .loading-state {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 60px 20px; color: var(--text3); gap: 12px;
+  }
+  .spinner {
+    width: 28px; height: 28px; border: 2px solid var(--border);
+    border-top-color: var(--accent); border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error-msg { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 18px; color: #991B1B; font-size: 13px; margin: 20px 0; line-height: 1.6; }
+  .error-msg a { color: #991B1B; font-weight: 500; }
+
+  /* EMPTY STATE */
+  .empty-state { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
+
+  /* ADD BUTTON */
+  .btn-primary {
+    padding: 7px 16px; border-radius: 8px; border: none;
+    background: var(--text); color: #fff; font-size: 12px;
+    font-family: 'Noto Sans TC', sans-serif; cursor: pointer;
+    font-weight: 500; transition: opacity 0.15s; text-decoration: none;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-outline {
+    padding: 7px 16px; border-radius: 8px;
+    border: 1px solid var(--border); background: var(--surface);
+    color: var(--text); font-size: 12px;
+    font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: all 0.15s;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* YEAR TOGGLE */
+  .year-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; background: var(--surface); color: var(--text); font-family: 'Noto Sans TC', sans-serif; cursor: pointer; }
+
+  @media (max-width: 768px) {
+    .sidebar { width: 0; overflow: hidden; }
+    .main { margin-left: 0; padding: 16px; }
+    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
+    .chart-row { grid-template-columns: 1fr; }
+    .inv-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <div class="mark">Dashboard</div>
+      <h2>代購<br>管理系統</h2>
+    </div>
+    <div class="sidebar-nav">
+      <button class="nav-item active" onclick="showPage('inventory')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        庫存管理
+      </button>
+      <button class="nav-item" onclick="showPage('sales')">
+        <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        已賣出分析
+      </button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="sync-info">
+        <span class="sync-dot"></span>資料來源：Google Sheets<br>
+        <span id="lastSync">載入中...</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ========== INVENTORY PAGE ========== -->
+    <div id="page-inventory" class="page active">
+      <div class="page-header">
+        <div>
+          <h1>庫存管理</h1>
+          <p id="inv-subtitle">載入資料中...</p>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <a href="https://docs.google.com/spreadsheets/d/1Zyuq4WODYzhJU-zMr9wkcJRaOdGfr4qsTQZxxlpzm0k" target="_blank" class="btn-outline">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+            開啟試算表
+          </a>
+          <button class="btn-primary" onclick="loadData()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            重新整理
+          </button>
+        </div>
+      </div>
+
+      <div id="inv-loading" class="loading-state"><div class="spinner"></div><span>連接 Google Sheets...</span></div>
+      <div id="inv-error" class="error-msg" style="display:none;"></div>
+
+      <div id="inv-content" style="display:none;">
+        <!-- Stats -->
+        <div class="inv-grid">
+          <div class="inv-stat">
+            <div class="inv-stat-icon" style="background:#FEE2E2;">📦</div>
+            <div>
+              <div class="inv-stat-label">未售出</div>
+              <div class="inv-stat-value" id="inv-count-unsold">—</div>
+            </div>
+          </div>
+          <div class="inv-stat">
+            <div class="inv-stat-icon" style="background:#E8EFF9;">🏠</div>
+            <div>
+              <div class="inv-stat-label">自用</div>
+              <div class="inv-stat-value" id="inv-count-self">—</div>
+            </div>
+          </div>
+          <div class="inv-stat">
+            <div class="inv-stat-icon" style="background:#F3E8FF;">🚚</div>
+            <div>
+              <div class="inv-stat-label">預購中</div>
+              <div class="inv-stat-value" id="inv-count-pending">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filter + Table -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">商品列表</div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <div class="filter-bar">
+                <button class="filter-btn active" onclick="filterInv('all', this)">全部</button>
+                <button class="filter-btn" onclick="filterInv('未售出', this)">未售出</button>
+                <button class="filter-btn" onclick="filterInv('自用', this)">自用</button>
+                <button class="filter-btn" onclick="filterInv('預購中', this)">預購中</button>
+              </div>
+              <div class="search-wrap">
+                <span class="search-icon">🔍</span>
+                <input class="search-input" id="inv-search" placeholder="搜尋品名..." oninput="renderInvTable()">
+              </div>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>狀態</th>
+                  <th>品名</th>
+                  <th>網站</th>
+                  <th>尺寸</th>
+                  <th>顏色</th>
+                  <th>購買日</th>
+                  <th>到台日</th>
+                  <th>成本 (台幣)</th>
+                  <th>持有人</th>
+                </tr>
+              </thead>
+              <tbody id="inv-tbody"></tbody>
+            </table>
+            <div id="inv-empty" class="empty-state" style="display:none;">沒有符合條件的商品</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== SALES PAGE ========== -->
+    <div id="page-sales" class="page">
+      <div class="page-header">
+        <div>
+          <h1>已賣出分析</h1>
+          <p id="sales-subtitle">載入資料中...</p>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center;">
+          <select class="year-select" id="year-select" onchange="renderSalesCharts()">
+            <option value="all">全部年份</option>
+            <option value="2025">2025</option>
+            <option value="2024">2024</option>
+            <option value="2023">2023</option>
+            <option value="2022">2022</option>
+            <option value="2021">2021</option>
+          </select>
+          <button class="btn-primary" onclick="loadData()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            重新整理
+          </button>
+        </div>
+      </div>
+
+      <div id="sales-loading" class="loading-state"><div class="spinner"></div><span>連接 Google Sheets...</span></div>
+      <div id="sales-error" class="error-msg" style="display:none;"></div>
+
+      <div id="sales-content" style="display:none;">
+        <!-- Metrics -->
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-label">總收入</div>
+            <div class="metric-value" id="s-revenue">—</div>
+            <div class="metric-sub" id="s-revenue-sub"></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">總利潤</div>
+            <div class="metric-value green" id="s-profit">—</div>
+            <div class="metric-sub" id="s-profit-sub"></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">交易筆數</div>
+            <div class="metric-value" id="s-count">—</div>
+            <div class="metric-sub" id="s-count-sub"></div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-label">平均利潤/件</div>
+            <div class="metric-value" id="s-avg">—</div>
+            <div class="metric-sub" id="s-avg-sub"></div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="chart-row">
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" id="chart-title">利潤趨勢</div>
+            </div>
+            <div class="card-body">
+              <div class="bar-chart-wrap">
+                <div class="chart-bars" id="profit-bars"></div>
+              </div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-header"><div class="card-title">平台銷售佔比</div></div>
+            <div class="card-body">
+              <div class="platform-list" id="platform-list"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Table -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">交易紀錄</div>
+            <div class="search-wrap">
+              <span class="search-icon">🔍</span>
+              <input class="search-input" id="sales-search" placeholder="搜尋品名、買家..." oninput="renderSalesTable()">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>狀態</th>
+                  <th>品名</th>
+                  <th>網站</th>
+                  <th>買家</th>
+                  <th>賣出日期</th>
+                  <th>實收</th>
+                  <th>成本</th>
+                  <th>利潤</th>
+                </tr>
+              </thead>
+              <tbody id="sales-tbody"></tbody>
+            </table>
+            <div id="sales-empty" class="empty-state" style="display:none;">沒有符合條件的資料</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ============================================================
+// CONFIG — 修改這裡的 SHEET_ID 和分頁名稱
+// ============================================================
+const SHEET_ID = '1Zyuq4WODYzhJU-zMr9wkcJRaOdGfr4qsTQZxxlpzm0k';
+const SHEET_NAME = '2021-26'; // 交易記錄分頁名稱
+// ============================================================
+
+let allData = [];
+let invFilter = 'all';
+
+// 狀態分類
+const INV_STATUSES = ['未售出', '自用', '預購中'];
+const SOLD_STATUSES = ['已售出', '出清'];
+
+function csvUrl(sheetName) {
+  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+}
+
+// Simple CSV parser (handles quoted fields)
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = parseCsvRow(lines[1]); // row 2 = column headers (row 1 = section labels)
+  const rows = [];
+  for (let i = 2; i < lines.length; i++) {
+    if (!lines[i].trim()) continue;
+    const vals = parseCsvRow(lines[i]);
+    if (vals.length < 2 || !vals[0]) continue;
+    const obj = {};
+    headers.forEach((h, idx) => { obj[h] = (vals[idx] || '').trim(); });
+    obj['_raw'] = vals;
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function parseCsvRow(line) {
+  const result = [];
+  let cur = '';
+  let inQuote = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') {
+      if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
+      else { inQuote = !inQuote; }
+    } else if (c === ',' && !inQuote) {
+      result.push(cur); cur = '';
+    } else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function cleanNT(str) {
+  if (!str) return 0;
+  const s = str.replace(/NT\$|,|\s/g, '').replace('−','-').replace('–','-');
+  const n = parseFloat(s);
+  return isNaN(n) ? 0 : n;
+}
+
+function fmtNT(n) {
+  if (isNaN(n)) return '—';
+  const abs = Math.abs(Math.round(n));
+  return (n < 0 ? '-' : '') + 'NT$' + abs.toLocaleString('zh-TW');
+}
+
+// Map row object from CSV columns
+function mapRow(obj) {
+  const vals = obj['_raw'] || [];
+  return {
+    status: (vals[0] || '').trim(),
+    date: (vals[1] || '').trim(),
+    site: (vals[2] || '').trim(),
+    name: (vals[3] || '').trim(),
+    size: (vals[4] || '').trim(),
+    color: (vals[5] || '').trim(),
+    weight: (vals[6] || '').trim(),
+    shipping: (vals[7] || '').trim(),
+    priceForeign: (vals[8] || '').trim(),
+    priceNT: cleanNT(vals[9] || ''),
+    splitShipping: cleanNT(vals[10] || ''),
+    arrivalDate: (vals[11] || '').trim(),
+    received: cleanNT(vals[12] || ''),
+    buyer: (vals[13] || '').trim(),
+    saleDate: (vals[14] || '').trim(),
+    profit: cleanNT(vals[15] || ''),
+    month: (vals[24] || '').trim(),
+    year: (vals[25] || '').trim(),
+  };
+}
+
+async function loadData() {
+  showLoading(true);
+  try {
+    const url = csvUrl(SHEET_NAME);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const parsed = parseCSV(text);
+    allData = parsed.map(mapRow).filter(r => r.status && r.name);
+
+    const now = new Date().toLocaleString('zh-TW');
+    document.getElementById('lastSync').textContent = `更新：${now}`;
+
+    showLoading(false);
+    renderAll();
+  } catch (e) {
+    showLoading(false, e.message);
+  }
+}
+
+function showLoading(loading, errMsg) {
+  ['inv','sales'].forEach(p => {
+    document.getElementById(`${p}-loading`).style.display = loading ? 'flex' : 'none';
+    document.getElementById(`${p}-error`).style.display = (!loading && errMsg) ? 'block' : 'none';
+    document.getElementById(`${p}-content`).style.display = (!loading && !errMsg) ? 'block' : 'none';
+    if (errMsg) {
+      document.getElementById(`${p}-error`).innerHTML =
+        `⚠️ 無法讀取試算表資料：${errMsg}<br><br>` +
+        `請確認試算表已設為「知道連結的人可以檢視」：<br>` +
+        `在 Google Sheets → 分享 → 將存取權限改為「任何知道這個連結的使用者」。<br><br>` +
+        `<a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}" target="_blank">點此開啟試算表</a>`;
+    }
+  });
+}
+
+function renderAll() {
+  renderInventory();
+  renderSalesCharts();
+  renderSalesTable();
+}
+
+// ---- INVENTORY ----
+function getInvData() {
+  return allData.filter(r => INV_STATUSES.some(s => r.status.includes(s)));
+}
+
+function renderInventory() {
+  const data = getInvData();
+  document.getElementById('inv-subtitle').textContent = `共 ${data.length} 件商品在追蹤中`;
+  document.getElementById('inv-count-unsold').textContent = data.filter(r => r.status.includes('未售出')).length;
+  document.getElementById('inv-count-self').textContent = data.filter(r => r.status.includes('自用')).length;
+  document.getElementById('inv-count-pending').textContent = data.filter(r => r.status.includes('預購中')).length;
+  renderInvTable();
+}
+
+function filterInv(status, btn) {
+  invFilter = status;
+  document.querySelectorAll('#page-inventory .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderInvTable();
+}
+
+function renderInvTable() {
+  const q = document.getElementById('inv-search').value.toLowerCase();
+  let data = getInvData();
+  if (invFilter !== 'all') data = data.filter(r => r.status.includes(invFilter));
+  if (q) data = data.filter(r => r.name.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q) || r.site.toLowerCase().includes(q));
+
+  const tbody = document.getElementById('inv-tbody');
+  const empty = document.getElementById('inv-empty');
+  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = data.map(r => {
+    const cost = r.priceNT + r.splitShipping;
+    return `<tr>
+      <td>${statusBadge(r.status)}</td>
+      <td><div class="name-cell" title="${r.name}">${r.name}</div></td>
+      <td>${r.site || '—'}</td>
+      <td>${r.size || '—'}</td>
+      <td>${r.color || '—'}</td>
+      <td class="mono">${r.date || '—'}</td>
+      <td class="mono">${r.arrivalDate || '—'}</td>
+      <td class="mono">${cost > 0 ? fmtNT(cost) : '—'}</td>
+      <td>${r.buyer || '—'}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ---- SALES ----
+function getSalesData() {
+  const year = document.getElementById('year-select')?.value || 'all';
+  let data = allData.filter(r => SOLD_STATUSES.some(s => r.status.includes(s)));
+  if (year !== 'all') data = data.filter(r => r.year === year || r.saleDate.startsWith(year));
+  return data;
+}
+
+function renderSalesCharts() {
+  const data = getSalesData();
+  const year = document.getElementById('year-select')?.value || 'all';
+
+  // Metrics
+  const totalRevenue = data.reduce((s, r) => s + r.received, 0);
+  const totalProfit = data.reduce((s, r) => s + r.profit, 0);
+  const count = data.length;
+  const avg = count ? Math.round(totalProfit / count) : 0;
+
+  document.getElementById('s-revenue').textContent = fmtNT(totalRevenue);
+  document.getElementById('s-revenue-sub').textContent = `${count} 筆交易`;
+  document.getElementById('s-profit').textContent = fmtNT(totalProfit);
+  document.getElementById('s-profit-sub').textContent = `利潤率 ${totalRevenue ? Math.round(totalProfit/totalRevenue*100) : 0}%`;
+  document.getElementById('s-count').textContent = count;
+  document.getElementById('s-count-sub').textContent = year === 'all' ? '2021–2026' : year + '年';
+  document.getElementById('s-avg').textContent = fmtNT(avg);
+  document.getElementById('s-avg-sub').textContent = '每筆平均';
+
+  document.getElementById('sales-subtitle').textContent = `${year === 'all' ? '全部' : year + '年'} · 共 ${count} 筆交易`;
+
+  // Bar chart (monthly if single year, else yearly)
+  const barsEl = document.getElementById('profit-bars');
+  if (year !== 'all') {
+    document.getElementById('chart-title').textContent = `${year} 年每月利潤`;
+    const monthly = Array(12).fill(0);
+    data.forEach(r => {
+      const m = parseInt(r.month) - 1;
+      if (m >= 0 && m < 12) monthly[m] += r.profit;
+    });
+    const labels = ['1','2','3','4','5','6','7','8','9','10','11','12'];
+    renderBars(barsEl, monthly, labels, '月');
+  } else {
+    document.getElementById('chart-title').textContent = '每年利潤總覽';
+    const years = ['2021','2022','2023','2024','2025','2026'];
+    const yearly = years.map(y => {
+      return data.filter(r => r.year === y || r.saleDate.startsWith(y)).reduce((s,r) => s+r.profit, 0);
+    });
+    renderBars(barsEl, yearly, years, '');
+  }
+
+  // Platform chart
+  const platforms = {};
+  data.forEach(r => {
+    const p = normalizePlatform(r.buyer);
+    platforms[p] = (platforms[p] || 0) + r.received;
+  });
+  const sorted = Object.entries(platforms).sort((a,b) => b[1]-a[1]).slice(0,6);
+  const maxRev = sorted[0]?.[1] || 1;
+  document.getElementById('platform-list').innerHTML = sorted.map(([name, rev]) => `
+    <div class="platform-row">
+      <div class="platform-name">${name}</div>
+      <div class="platform-bar-wrap"><div class="platform-bar" style="width:${Math.round(rev/maxRev*100)}%"></div></div>
+      <div class="platform-val">${fmtNT(rev)}</div>
+    </div>`).join('');
+
+  renderSalesTable();
+}
+
+function normalizePlatform(buyer) {
+  if (!buyer) return '其他';
+  if (buyer.includes('蝦皮') || buyer.toLowerCase().includes('shopee')) return '蝦皮';
+  if (buyer.includes('FB') || buyer.includes('好賣')) return 'FB/好賣+';
+  return buyer.length > 5 ? buyer.slice(0,5) : buyer;
+}
+
+function renderBars(el, values, labels, unit) {
+  const max = Math.max(...values, 1);
+  el.innerHTML = values.map((v, i) => {
+    const h = Math.max(Math.round((v / max) * 100), v !== 0 ? 2 : 0);
+    const color = v >= 0 ? '#2D5F3F' : '#B83232';
+    const display = Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'k' : Math.round(v);
+    return `<div class="chart-bar-col">
+      <div class="chart-bar-val">${display}</div>
+      <div class="chart-bar" style="height:${h}px;background:${color};opacity:${v<0?0.6:0.85};"></div>
+      <div class="chart-bar-lbl">${labels[i]}${unit}</div>
+    </div>`;
+  }).join('');
+}
+
+function renderSalesTable() {
+  const q = document.getElementById('sales-search')?.value.toLowerCase() || '';
+  let data = getSalesData();
+  if (q) data = data.filter(r => r.name.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q));
+
+  const tbody = document.getElementById('sales-tbody');
+  const empty = document.getElementById('sales-empty');
+  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  empty.style.display = 'none';
+
+  // Sort by sale date descending
+  data = [...data].sort((a,b) => b.saleDate.localeCompare(a.saleDate));
+
+  tbody.innerHTML = data.map(r => {
+    const cost = r.priceNT + r.splitShipping;
+    const profitClass = r.profit >= 0 ? 'pos' : 'neg';
+    return `<tr>
+      <td>${statusBadge(r.status)}</td>
+      <td><div class="name-cell" title="${r.name}">${r.name}</div></td>
+      <td>${r.site || '—'}</td>
+      <td>${r.buyer || '—'}</td>
+      <td class="mono">${r.saleDate || '—'}</td>
+      <td class="mono">${r.received ? fmtNT(r.received) : '—'}</td>
+      <td class="mono">${cost > 0 ? fmtNT(cost) : '—'}</td>
+      <td class="mono ${profitClass}">${fmtNT(r.profit)}</td>
+    </tr>`;
+  }).join('');
+}
+
+function statusBadge(status) {
+  if (!status) return '';
+  if (status.includes('已售出')) return `<span class="badge badge-sold">已售出</span>`;
+  if (status.includes('自用')) return `<span class="badge badge-self">自用</span>`;
+  if (status.includes('出清')) return `<span class="badge badge-clear">出清</span>`;
+  if (status.includes('預購中')) return `<span class="badge badge-pending">預購中</span>`;
+  if (status.includes('未售出')) return `<span class="badge badge-unsold">未售出</span>`;
+  return `<span class="badge" style="background:var(--surface2);color:var(--text2);">${status}</span>`;
+}
+
+function showPage(name) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(`page-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// Auto-load on start
+loadData();
+</script>
+</body>
+</html>
