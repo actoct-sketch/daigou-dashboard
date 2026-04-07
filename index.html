@@ -174,7 +174,7 @@
   .platform-val { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; width: 60px; text-align: right; flex-shrink: 0; }
 
   /* INVENTORY SPECIFIC */
-  .inv-grid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
+  .inv-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
   .inv-stat {
     background: var(--surface); border: 1px solid var(--border);
     border-radius: 12px; padding: 14px 16px;
@@ -269,7 +269,7 @@
           <p id="inv-subtitle">載入資料中...</p>
         </div>
         <div style="display:flex;gap:8px;">
-          <a href="https://docs.google.com/spreadsheets/d/1Zyuq4WODYzhJU-zMr9wkcJRaOdGfr4qsTQZxxlpzm0k" target="_blank" class="btn-outline">
+          <a href="https://docs.google.com/spreadsheets/d/1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o" target="_blank" class="btn-outline">
             <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
             開啟試算表
           </a>
@@ -289,7 +289,7 @@
           <div class="inv-stat">
             <div class="inv-stat-icon" style="background:#FEE2E2;">📦</div>
             <div>
-              <div class="inv-stat-label">未售出</div>
+              <div class="inv-stat-label">在庫</div>
               <div class="inv-stat-value" id="inv-count-unsold">—</div>
             </div>
           </div>
@@ -298,13 +298,6 @@
             <div>
               <div class="inv-stat-label">自用</div>
               <div class="inv-stat-value" id="inv-count-self">—</div>
-            </div>
-          </div>
-          <div class="inv-stat">
-            <div class="inv-stat-icon" style="background:#F3E8FF;">🚚</div>
-            <div>
-              <div class="inv-stat-label">預購中</div>
-              <div class="inv-stat-value" id="inv-count-pending">—</div>
             </div>
           </div>
         </div>
@@ -316,9 +309,8 @@
             <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
               <div class="filter-bar">
                 <button class="filter-btn active" onclick="filterInv('all', this)">全部</button>
-                <button class="filter-btn" onclick="filterInv('未售出', this)">未售出</button>
+                <button class="filter-btn" onclick="filterInv('在庫', this)">在庫</button>
                 <button class="filter-btn" onclick="filterInv('自用', this)">自用</button>
-                <button class="filter-btn" onclick="filterInv('預購中', this)">預購中</button>
               </div>
               <div class="search-wrap">
                 <span class="search-icon">🔍</span>
@@ -413,7 +405,7 @@
             </div>
           </div>
           <div class="card">
-            <div class="card-header"><div class="card-title">平台銷售佔比</div></div>
+            <div class="card-header"><div class="card-title">平台利潤佔比</div></div>
             <div class="card-body">
               <div class="platform-list" id="platform-list"></div>
             </div>
@@ -458,7 +450,7 @@
 // ============================================================
 // CONFIG — 修改這裡的 SHEET_ID 和分頁名稱
 // ============================================================
-const SHEET_ID = '1Zyuq4WODYzhJU-zMr9wkcJRaOdGfr4qsTQZxxlpzm0k';
+const SHEET_ID = '1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o';
 const SHEET_NAME = '2021-26'; // 交易記錄分頁名稱
 // ============================================================
 
@@ -466,7 +458,7 @@ let allData = [];
 let invFilter = 'all';
 
 // 狀態分類
-const INV_STATUSES = ['未售出', '自用', '預購中'];
+const INV_STATUSES = ['在庫', '自用'];
 const SOLD_STATUSES = ['已售出', '出清'];
 
 function csvUrl(sheetName) {
@@ -573,10 +565,12 @@ function showLoading(loading, errMsg) {
     document.getElementById(`${p}-content`).style.display = (!loading && !errMsg) ? 'block' : 'none';
     if (errMsg) {
       document.getElementById(`${p}-error`).innerHTML =
-        `⚠️ 無法讀取試算表資料：${errMsg}<br><br>` +
-        `請確認試算表已設為「知道連結的人可以檢視」：<br>` +
-        `在 Google Sheets → 分享 → 將存取權限改為「任何知道這個連結的使用者」。<br><br>` +
-        `<a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}" target="_blank">點此開啟試算表</a>`;
+        `⚠️ 無法讀取試算表資料<br><br>` +
+        `需要額外將試算表「發布到網路」才能讓 dashboard 讀取：<br><br>` +
+        `1. 開啟試算表 → 點「檔案」→「共用」→「發布到網路」<br>` +
+        `2. 選「整份文件」+「逗號分隔值 (.csv)」<br>` +
+        `3. 按「發布」→「確定」<br><br>` +
+        `<a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}" target="_blank" style="color:var(--accent);">點此開啟試算表</a>`;
     }
   });
 }
@@ -595,9 +589,8 @@ function getInvData() {
 function renderInventory() {
   const data = getInvData();
   document.getElementById('inv-subtitle').textContent = `共 ${data.length} 件商品在追蹤中`;
-  document.getElementById('inv-count-unsold').textContent = data.filter(r => r.status.includes('未售出')).length;
+  document.getElementById('inv-count-unsold').textContent = data.filter(r => r.status.includes('在庫')).length;
   document.getElementById('inv-count-self').textContent = data.filter(r => r.status.includes('自用')).length;
-  document.getElementById('inv-count-pending').textContent = data.filter(r => r.status.includes('預購中')).length;
   renderInvTable();
 }
 
@@ -684,19 +677,19 @@ function renderSalesCharts() {
     renderBars(barsEl, yearly, years, '');
   }
 
-  // Platform chart
+  // Platform chart - by profit total
   const platforms = {};
   data.forEach(r => {
     const p = normalizePlatform(r.buyer);
-    platforms[p] = (platforms[p] || 0) + r.received;
+    platforms[p] = (platforms[p] || 0) + r.profit;
   });
   const sorted = Object.entries(platforms).sort((a,b) => b[1]-a[1]).slice(0,6);
-  const maxRev = sorted[0]?.[1] || 1;
-  document.getElementById('platform-list').innerHTML = sorted.map(([name, rev]) => `
+  const maxVal = Math.max(...sorted.map(s => Math.abs(s[1])), 1);
+  document.getElementById('platform-list').innerHTML = sorted.map(([name, prof]) => `
     <div class="platform-row">
       <div class="platform-name">${name}</div>
-      <div class="platform-bar-wrap"><div class="platform-bar" style="width:${Math.round(rev/maxRev*100)}%"></div></div>
-      <div class="platform-val">${fmtNT(rev)}</div>
+      <div class="platform-bar-wrap"><div class="platform-bar" style="width:${Math.round(Math.abs(prof)/maxVal*100)}%;background:${prof<0?'var(--danger)':'var(--accent)'};"></div></div>
+      <div class="platform-val" style="color:${prof<0?'var(--danger)':'var(--text2)'}">${fmtNT(prof)}</div>
     </div>`).join('');
 
   renderSalesTable();
@@ -758,6 +751,7 @@ function statusBadge(status) {
   if (status.includes('自用')) return `<span class="badge badge-self">自用</span>`;
   if (status.includes('出清')) return `<span class="badge badge-clear">出清</span>`;
   if (status.includes('預購中')) return `<span class="badge badge-pending">預購中</span>`;
+  if (status.includes('在庫')) return `<span class="badge badge-unsold">在庫</span>`;
   if (status.includes('未售出')) return `<span class="badge badge-unsold">未售出</span>`;
   return `<span class="badge" style="background:var(--surface2);color:var(--text2);">${status}</span>`;
 }
