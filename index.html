@@ -5,313 +5,211 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>代購儀表板</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
   :root {
-    --bg: #F5F2ED;
-    --surface: #FFFFFF;
-    --surface2: #EEEBE4;
-    --border: #D8D3C8;
-    --text: #1A1714;
-    --text2: #6B6560;
-    --text3: #9E9892;
-    --accent: #2D5F3F;
-    --accent-light: #EAF2EC;
-    --sold: #2D5F3F;
-    --sold-bg: #EAF2EC;
-    --self-c: #1E4A8A;
-    --self-bg: #E8EFF9;
-    --clear-c: #8A4A00;
-    --clear-bg: #FFF0DC;
-    --danger: #B83232;
-    --profit: #2D6B4A;
+    --bg:#F5F2ED;--surface:#FFF;--surface2:#EEEBE4;--border:#D8D3C8;
+    --text:#1A1714;--text2:#6B6560;--text3:#9E9892;
+    --accent:#2D5F3F;--sold-bg:#EAF2EC;--self-bg:#E8EFF9;--self-c:#1E4A8A;
+    --clear-bg:#FFF0DC;--clear-c:#8A4A00;--danger:#B83232;--profit:#2D6B4A;
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    font-family: 'Noto Sans TC', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-    font-size: 14px;
-  }
-  /* LAYOUT */
-  .app { display: flex; min-height: 100vh; }
-  .sidebar {
-    width: 220px;
-    background: var(--text);
-    color: #fff;
-    padding: 0;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    position: fixed;
-    top: 0; left: 0; bottom: 0;
-    z-index: 100;
-  }
-  .sidebar-logo {
-    padding: 24px 20px 20px;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-  .sidebar-logo .mark { font-family: 'DM Mono', monospace; font-size: 11px; color: rgba(255,255,255,0.35); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 6px; }
-  .sidebar-logo h2 { font-size: 17px; font-weight: 700; color: #fff; line-height: 1.3; }
-  .sidebar-nav { padding: 16px 12px; flex: 1; }
-  .nav-item {
-    display: flex; align-items: center; gap: 10px;
-    padding: 10px 12px; border-radius: 8px;
-    font-size: 13px; color: rgba(255,255,255,0.55);
-    cursor: pointer; margin-bottom: 2px;
-    transition: all 0.15s; font-weight: 500;
-    border: none; background: transparent; width: 100%; text-align: left;
-  }
-  .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
-  .nav-item.active { background: rgba(255,255,255,0.1); color: #fff; }
-  .nav-icon { width: 16px; height: 16px; opacity: 0.7; flex-shrink: 0; }
-  .nav-item.active .nav-icon { opacity: 1; }
-  .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,0.08); }
-  .sync-info { font-size: 11px; color: rgba(255,255,255,0.3); line-height: 1.6; }
-  .sync-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: #4CAF50; margin-right: 5px; }
-
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans TC',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;}
+  .app{display:flex;min-height:100vh;}
+  /* SIDEBAR */
+  .sidebar{width:220px;background:var(--text);flex-shrink:0;display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;}
+  .sidebar-logo{padding:24px 20px 20px;border-bottom:1px solid rgba(255,255,255,.08);}
+  .sidebar-logo .mark{font-family:'DM Mono',monospace;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;}
+  .sidebar-logo h2{font-size:17px;font-weight:700;color:#fff;line-height:1.3;}
+  .sidebar-nav{padding:16px 12px;flex:1;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:8px;font-size:13px;color:rgba(255,255,255,.55);cursor:pointer;margin-bottom:2px;transition:all .15s;font-weight:500;border:none;background:transparent;width:100%;text-align:left;}
+  .nav-item:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.85);}
+  .nav-item.active{background:rgba(255,255,255,.1);color:#fff;}
+  .nav-icon{width:16px;height:16px;opacity:.7;flex-shrink:0;}
+  .nav-item.active .nav-icon{opacity:1;}
+  .sidebar-footer{padding:16px 20px;border-top:1px solid rgba(255,255,255,.08);}
+  .sync-info{font-size:11px;color:rgba(255,255,255,.3);line-height:1.8;}
+  .sync-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:#4CAF50;margin-right:5px;}
+  .google-btn{display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.65);font-size:11px;cursor:pointer;margin-top:10px;font-family:'Noto Sans TC',sans-serif;transition:all .15s;width:100%;}
+  .google-btn:hover{background:rgba(255,255,255,.14);color:#fff;}
+  .google-btn.signed-in{border-color:rgba(76,175,80,.5);color:rgba(76,175,80,.9);}
   /* MAIN */
-  .main { margin-left: 220px; flex: 1; padding: 28px 32px; max-width: 1200px; }
-  .page { display: none; }
-  .page.active { display: block; }
-
-  /* PAGE HEADER */
-  .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 24px; }
-  .page-header h1 { font-size: 24px; font-weight: 700; color: var(--text); }
-  .page-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
-
-  /* FILTER BAR */
-  .filter-bar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .filter-btn {
-    padding: 5px 14px; border-radius: 20px; font-size: 12px;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text2); cursor: pointer; transition: all 0.15s;
-    font-family: 'Noto Sans TC', sans-serif;
-  }
-  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
-  .filter-btn.active { background: var(--text); color: #fff; border-color: var(--text); }
-
-  /* METRIC CARDS */
-  .metrics-grid { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 12px; margin-bottom: 24px; }
-  .metric-card {
-    background: var(--surface); border-radius: 12px;
-    border: 1px solid var(--border); padding: 16px 18px;
-  }
-  .metric-label { font-size: 11px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 8px; }
-  .metric-value { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
-  .metric-value.green { color: var(--profit); }
-  .metric-value.red { color: var(--danger); }
-  .metric-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
-
+  .main{margin-left:220px;flex:1;padding:28px 32px;max-width:1180px;}
+  .page{display:none;}.page.active{display:block;}
+  .page-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+  .page-header h1{font-size:24px;font-weight:700;}
+  .page-header p{font-size:13px;color:var(--text2);margin-top:4px;}
+  /* FILTERS */
+  .filter-btn{padding:5px 14px;border-radius:20px;font-size:12px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;font-family:'Noto Sans TC',sans-serif;}
+  .filter-btn:hover{border-color:var(--accent);color:var(--accent);}
+  .filter-btn.active{background:var(--text);color:#fff;border-color:var(--text);}
+  /* METRICS */
+  .metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px;}
+  .metric-card{background:var(--surface);border-radius:12px;border:1px solid var(--border);padding:16px 18px;}
+  .metric-label{font-size:11px;color:var(--text3);letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+  .metric-value{font-family:'DM Mono',monospace;font-size:22px;font-weight:500;}
+  .metric-value.green{color:var(--profit);}
+  .metric-sub{font-size:11px;color:var(--text3);margin-top:4px;}
   /* CARDS */
-  .card {
-    background: var(--surface); border-radius: 12px;
-    border: 1px solid var(--border); margin-bottom: 20px;
-    overflow: hidden;
-  }
-  .card-header {
-    padding: 14px 18px; border-bottom: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .card-title { font-size: 13px; font-weight: 700; color: var(--text); }
-  .card-body { padding: 18px; }
-
+  .card{background:var(--surface);border-radius:12px;border:1px solid var(--border);margin-bottom:20px;overflow:hidden;}
+  .card-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+  .card-title{font-size:13px;font-weight:700;}
+  .card-body{padding:18px;}
   /* TABLE */
-  .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    text-align: left; padding: 8px 14px; font-size: 11px;
-    font-weight: 500; color: var(--text3); border-bottom: 1px solid var(--border);
-    white-space: nowrap; letter-spacing: 0.3px;
-    background: var(--surface2);
-  }
-  td { padding: 10px 14px; border-bottom: 1px solid #F0EDE8; vertical-align: middle; white-space: nowrap; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #FAFAF8; }
-  .name-cell { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--text); font-weight: 500; }
-  .mono { font-family: 'DM Mono', monospace; font-size: 12px; }
-  .pos { color: var(--profit); }
-  .neg { color: var(--danger); }
-
-  /* STATUS BADGES */
-  .badge {
-    display: inline-block; padding: 2px 9px; border-radius: 12px;
-    font-size: 11px; font-weight: 500; white-space: nowrap;
-  }
-  .badge-sold { background: var(--sold-bg); color: var(--sold); }
-  .badge-self { background: var(--self-bg); color: var(--self-c); }
-  .badge-clear { background: var(--clear-bg); color: var(--clear-c); }
-  .badge-pending { background: #F3E8FF; color: #6B21A8; }
-  .badge-unsold { background: #FEE2E2; color: #991B1B; }
-
-  /* SEARCH INPUT */
-  .search-wrap { position: relative; }
-  .search-input {
-    padding: 7px 12px 7px 32px; border: 1px solid var(--border);
-    border-radius: 8px; font-size: 12px; background: var(--bg);
-    color: var(--text); font-family: 'Noto Sans TC', sans-serif;
-    width: 220px; outline: none;
-    transition: border-color 0.15s;
-  }
-  .search-input:focus { border-color: var(--accent); }
-  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 13px; }
-
+  .table-wrap{overflow-x:auto;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  th{text-align:left;padding:8px 14px;font-size:11px;font-weight:500;color:var(--text3);border-bottom:1px solid var(--border);white-space:nowrap;background:var(--surface2);}
+  td{padding:10px 14px;border-bottom:1px solid #F0EDE8;vertical-align:middle;white-space:nowrap;}
+  tr:last-child td{border-bottom:none;}
+  tr.clickable:hover td{background:#F5F5F0;cursor:pointer;}
+  .name-cell{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;color:var(--accent);text-decoration:underline;text-underline-offset:2px;cursor:pointer;}
+  .name-plain{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500;}
+  .mono{font-family:'DM Mono',monospace;font-size:12px;}
+  .pos{color:var(--profit);}.neg{color:var(--danger);}
+  /* BADGES */
+  .badge{display:inline-block;padding:2px 9px;border-radius:12px;font-size:11px;font-weight:500;white-space:nowrap;}
+  .badge-sold{background:var(--sold-bg);color:#2D5F3F;}
+  .badge-self{background:var(--self-bg);color:var(--self-c);}
+  .badge-clear{background:var(--clear-bg);color:var(--clear-c);}
+  .badge-instock{background:#FEE2E2;color:#991B1B;}
+  /* SEARCH */
+  .search-wrap{position:relative;}
+  .search-input{padding:7px 12px 7px 32px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--bg);color:var(--text);font-family:'Noto Sans TC',sans-serif;width:220px;outline:none;transition:border-color .15s;}
+  .search-input:focus{border-color:var(--accent);}
+  .search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:13px;}
+  .search-count{font-size:12px;color:var(--text3);white-space:nowrap;}
   /* CHARTS */
-  .chart-row { display: grid; grid-template-columns: 1.6fr 1fr; gap: 16px; margin-bottom: 20px; }
-  .bar-chart-wrap { padding: 4px 0; }
-  .chart-bars { display: flex; align-items: flex-end; gap: 5px; height: 120px; }
-  .chart-bar-col { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; justify-content: flex-end; height: 100%; }
-  .chart-bar { width: 100%; border-radius: 3px 3px 0 0; transition: opacity 0.15s; cursor: pointer; }
-  .chart-bar:hover { opacity: 0.75; }
-  .chart-bar-lbl { font-size: 9px; color: var(--text3); }
-  .chart-bar-val { font-size: 9px; color: var(--text2); font-family: 'DM Mono', monospace; }
-
-  .platform-list { display: flex; flex-direction: column; gap: 10px; }
-  .platform-row { display: flex; align-items: center; gap: 10px; }
-  .platform-name { font-size: 12px; color: var(--text); width: 70px; flex-shrink: 0; }
-  .platform-bar-wrap { flex: 1; background: var(--surface2); border-radius: 4px; height: 6px; overflow: hidden; }
-  .platform-bar { height: 100%; border-radius: 4px; background: var(--accent); }
-  .platform-val { font-size: 11px; color: var(--text2); font-family: 'DM Mono', monospace; width: 60px; text-align: right; flex-shrink: 0; }
-
-  /* INVENTORY SPECIFIC */
-  .inv-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 12px; margin-bottom: 20px; }
-  .inv-stat {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px;
-    display: flex; align-items: center; gap: 14px;
-  }
-  .inv-stat-icon { width: 36px; height: 36px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
-  .inv-stat-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
-  .inv-stat-value { font-size: 20px; font-weight: 700; font-family: 'DM Mono', monospace; color: var(--text); }
-
-  /* LOADING / ERROR */
-  .loading-state {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 60px 20px; color: var(--text3); gap: 12px;
-  }
-  .spinner {
-    width: 28px; height: 28px; border: 2px solid var(--border);
-    border-top-color: var(--accent); border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .error-msg { background: #FEF2F2; border: 1px solid #FECACA; border-radius: 8px; padding: 14px 18px; color: #991B1B; font-size: 13px; margin: 20px 0; line-height: 1.6; }
-  .error-msg a { color: #991B1B; font-weight: 500; }
-
-  /* EMPTY STATE */
-  .empty-state { text-align: center; padding: 40px; color: var(--text3); font-size: 13px; }
-
-  /* ADD BUTTON */
-  .btn-primary {
-    padding: 7px 16px; border-radius: 8px; border: none;
-    background: var(--text); color: #fff; font-size: 12px;
-    font-family: 'Noto Sans TC', sans-serif; cursor: pointer;
-    font-weight: 500; transition: opacity 0.15s; text-decoration: none;
-    display: inline-flex; align-items: center; gap: 5px;
-  }
-  .btn-primary:hover { opacity: 0.82; }
-  .btn-outline {
-    padding: 7px 16px; border-radius: 8px;
-    border: 1px solid var(--border); background: var(--surface);
-    color: var(--text); font-size: 12px;
-    font-family: 'Noto Sans TC', sans-serif; cursor: pointer; transition: all 0.15s;
-    text-decoration: none; display: inline-flex; align-items: center; gap: 5px;
-  }
-  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
-
-  /* YEAR TOGGLE */
-  .year-select { padding: 6px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 12px; background: var(--surface); color: var(--text); font-family: 'Noto Sans TC', sans-serif; cursor: pointer; }
-
-  @media (max-width: 768px) {
-    .sidebar { width: 0; overflow: hidden; }
-    .main { margin-left: 0; padding: 16px; }
-    .metrics-grid { grid-template-columns: repeat(2, 1fr); }
-    .chart-row { grid-template-columns: 1fr; }
-    .inv-grid { grid-template-columns: repeat(2, 1fr); }
+  .chart-row{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:20px;}
+  .chart-bars{display:flex;align-items:flex-end;gap:5px;height:120px;}
+  .chart-bar-col{display:flex;flex-direction:column;align-items:center;gap:3px;flex:1;justify-content:flex-end;height:100%;}
+  .chart-bar{width:100%;border-radius:3px 3px 0 0;}
+  .chart-bar:hover{opacity:.75;}
+  .chart-bar-lbl{font-size:9px;color:var(--text3);}
+  .chart-bar-val{font-size:9px;font-family:'DM Mono',monospace;}
+  .platform-list{display:flex;flex-direction:column;gap:10px;}
+  .platform-row{display:flex;align-items:center;gap:10px;}
+  .platform-name{font-size:12px;width:70px;flex-shrink:0;}
+  .platform-bar-wrap{flex:1;background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;}
+  .platform-bar{height:100%;border-radius:4px;}
+  .platform-val{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;width:70px;text-align:right;flex-shrink:0;}
+  /* INVENTORY */
+  .inv-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:20px;}
+  .inv-stat{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:flex;align-items:center;gap:14px;}
+  .inv-stat-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+  .inv-stat-label{font-size:11px;color:var(--text3);margin-bottom:4px;}
+  .inv-stat-value{font-size:20px;font-weight:700;font-family:'DM Mono',monospace;}
+  /* LOADING */
+  .loading-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--text3);gap:12px;}
+  .spinner{width:28px;height:28px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .error-msg{background:#FEF2F2;border:1px solid #FECACA;border-radius:8px;padding:14px 18px;color:#991B1B;font-size:13px;margin:20px 0;line-height:1.8;}
+  .empty-state{text-align:center;padding:40px;color:var(--text3);font-size:13px;}
+  /* BUTTONS */
+  .btn-primary{padding:7px 16px;border-radius:8px;border:none;background:var(--text);color:#fff;font-size:12px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;font-weight:500;transition:opacity .15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+  .btn-primary:hover{opacity:.82;}
+  .btn-outline{padding:7px 16px;border-radius:8px;border:1px solid var(--border);background:var(--surface);color:var(--text);font-size:12px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;transition:all .15s;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+  .btn-outline:hover{border-color:var(--accent);color:var(--accent);}
+  .btn-accent{padding:7px 16px;border-radius:8px;border:none;background:var(--accent);color:#fff;font-size:12px;font-family:'Noto Sans TC',sans-serif;cursor:pointer;font-weight:500;transition:opacity .15s;display:inline-flex;align-items:center;gap:5px;}
+  .btn-accent:hover{opacity:.85;}
+  .year-select{padding:6px 10px;border:1px solid var(--border);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text);font-family:'Noto Sans TC',sans-serif;cursor:pointer;}
+  /* MODAL */
+  .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:999;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .modal-overlay.open{opacity:1;pointer-events:all;}
+  .modal{background:var(--surface);border-radius:16px;padding:28px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;transform:translateY(12px);transition:transform .2s;box-shadow:0 20px 60px rgba(0,0,0,.15);}
+  .modal-overlay.open .modal{transform:translateY(0);}
+  .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  .modal-title{font-size:16px;font-weight:700;}
+  .modal-close{background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3);padding:2px 6px;border-radius:4px;}
+  .modal-close:hover{background:var(--surface2);}
+  .form-group{margin-bottom:14px;}
+  .form-label{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.3px;text-transform:uppercase;display:block;margin-bottom:5px;}
+  .form-input,.form-select{width:100%;padding:8px 12px;border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:'Noto Sans TC',sans-serif;color:var(--text);background:var(--bg);outline:none;transition:border-color .15s;}
+  .form-input:focus,.form-select:focus{border-color:var(--accent);}
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  .profit-preview{background:var(--surface2);border-radius:8px;padding:10px 14px;margin-top:8px;font-size:13px;display:flex;justify-content:space-between;align-items:center;}
+  .profit-label{color:var(--text2);}
+  .profit-value{font-family:'DM Mono',monospace;font-weight:500;}
+  .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+  .save-status{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:6px;margin-right:auto;}
+  .save-status.ok{color:var(--profit);}.save-status.err{color:var(--danger);}
+  .auth-notice{background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:10px 14px;font-size:12px;color:#7A5800;margin-bottom:16px;line-height:1.6;}
+  .item-name-preview{margin-bottom:16px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:12px;color:var(--text2);line-height:1.5;}
+  @media(max-width:768px){
+    .sidebar{width:0;overflow:hidden;}.main{margin-left:0;padding:16px;}
+    .metrics-grid{grid-template-columns:repeat(2,1fr);}
+    .chart-row{grid-template-columns:1fr;}
+    .form-row{grid-template-columns:1fr;}
   }
 </style>
 </head>
 <body>
-
 <div class="app">
-  <!-- SIDEBAR -->
   <nav class="sidebar">
     <div class="sidebar-logo">
       <div class="mark">Dashboard</div>
       <h2>代購<br>管理系統</h2>
     </div>
     <div class="sidebar-nav">
-      <button class="nav-item active" onclick="showPage('inventory')">
+      <button class="nav-item active" onclick="showPage('inventory',this)">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
         庫存管理
       </button>
-      <button class="nav-item" onclick="showPage('sales')">
+      <button class="nav-item" onclick="showPage('sales',this)">
         <svg class="nav-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         已賣出分析
       </button>
     </div>
     <div class="sidebar-footer">
       <div class="sync-info">
-        <span class="sync-dot"></span>資料來源：Google Sheets<br>
+        <span class="sync-dot"></span>Google Sheets 同步<br>
         <span id="lastSync">載入中...</span>
       </div>
+      <button class="google-btn" id="authBtn" onclick="handleAuth()">
+        <svg width="12" height="12" viewBox="0 0 18 18"><path fill="currentColor" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="currentColor" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2.01c-.72.48-1.63.76-2.7.76-2.08 0-3.84-1.4-4.47-3.29H1.87v2.07A8 8 0 0 0 8.98 17z"/><path fill="currentColor" d="M4.51 10.52A4.8 4.8 0 0 1 4.26 9c0-.53.09-1.04.25-1.52V5.41H1.87A8 8 0 0 0 .98 9c0 1.29.31 2.51.89 3.59l2.64-2.07z"/><path fill="currentColor" d="M8.98 3.58c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 8.98 1a8 8 0 0 0-7.11 4.41l2.64 2.07c.63-1.89 2.39-3.29 4.47-3.29z"/></svg>
+        <span id="authBtnText">登入以啟用編輯</span>
+      </button>
     </div>
   </nav>
 
-  <!-- MAIN CONTENT -->
   <main class="main">
-
-    <!-- ========== INVENTORY PAGE ========== -->
+    <!-- INVENTORY PAGE -->
     <div id="page-inventory" class="page active">
       <div class="page-header">
         <div>
           <h1>庫存管理</h1>
           <p id="inv-subtitle">載入資料中...</p>
         </div>
-        <div style="display:flex;gap:8px;">
-          <a href="https://docs.google.com/spreadsheets/d/1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o" target="_blank" class="btn-outline">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
-            開啟試算表
-          </a>
-          <button class="btn-primary" onclick="loadData()">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            重新整理
-          </button>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <a href="https://docs.google.com/spreadsheets/d/1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o" target="_blank" class="btn-outline">↗ 試算表</a>
+          <button class="btn-accent" onclick="openAddModal()">+ 新增商品</button>
+          <button class="btn-primary" onclick="loadData()">↺ 重新整理</button>
         </div>
       </div>
-
       <div id="inv-loading" class="loading-state"><div class="spinner"></div><span>連接 Google Sheets...</span></div>
       <div id="inv-error" class="error-msg" style="display:none;"></div>
-
       <div id="inv-content" style="display:none;">
-        <!-- Stats -->
         <div class="inv-grid">
           <div class="inv-stat">
             <div class="inv-stat-icon" style="background:#FEE2E2;">📦</div>
-            <div>
-              <div class="inv-stat-label">在庫</div>
-              <div class="inv-stat-value" id="inv-count-unsold">—</div>
-            </div>
+            <div><div class="inv-stat-label">在庫</div><div class="inv-stat-value" id="inv-count-stock">—</div></div>
           </div>
           <div class="inv-stat">
             <div class="inv-stat-icon" style="background:#E8EFF9;">🏠</div>
-            <div>
-              <div class="inv-stat-label">自用</div>
-              <div class="inv-stat-value" id="inv-count-self">—</div>
-            </div>
+            <div><div class="inv-stat-label">自用</div><div class="inv-stat-value" id="inv-count-self">—</div></div>
           </div>
         </div>
-
-        <!-- Filter + Table -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">商品列表</div>
-            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-              <div class="filter-bar">
-                <button class="filter-btn active" onclick="filterInv('all', this)">全部</button>
-                <button class="filter-btn" onclick="filterInv('在庫', this)">在庫</button>
-                <button class="filter-btn" onclick="filterInv('自用', this)">自用</button>
+            <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+              <span class="card-title">商品列表</span>
+              <div style="display:flex;gap:6px;">
+                <button class="filter-btn active" onclick="filterInv('all',this)">全部</button>
+                <button class="filter-btn" onclick="filterInv('在庫',this)">在庫</button>
+                <button class="filter-btn" onclick="filterInv('自用',this)">自用</button>
               </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <span class="search-count" id="inv-count-label"></span>
               <div class="search-wrap">
                 <span class="search-icon">🔍</span>
                 <input class="search-input" id="inv-search" placeholder="搜尋品名..." oninput="renderInvTable()">
@@ -320,19 +218,10 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>狀態</th>
-                  <th>品名</th>
-                  <th>網站</th>
-                  <th>尺寸</th>
-                  <th>顏色</th>
-                  <th>購買日</th>
-                  <th>到台日</th>
-                  <th>成本 (台幣)</th>
-                  <th>持有人</th>
-                </tr>
-              </thead>
+              <thead><tr>
+                <th>狀態</th><th>品名</th><th>網站</th><th>尺寸</th><th>顏色</th>
+                <th>購買日</th><th>到台日</th><th>成本</th><th>持有人</th>
+              </tr></thead>
               <tbody id="inv-tbody"></tbody>
             </table>
             <div id="inv-empty" class="empty-state" style="display:none;">沒有符合條件的商品</div>
@@ -341,7 +230,7 @@
       </div>
     </div>
 
-    <!-- ========== SALES PAGE ========== -->
+    <!-- SALES PAGE -->
     <div id="page-sales" class="page">
       <div class="page-header">
         <div>
@@ -357,65 +246,31 @@
             <option value="2022">2022</option>
             <option value="2021">2021</option>
           </select>
-          <button class="btn-primary" onclick="loadData()">
-            <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-            重新整理
-          </button>
+          <button class="btn-primary" onclick="loadData()">↺ 重新整理</button>
         </div>
       </div>
-
       <div id="sales-loading" class="loading-state"><div class="spinner"></div><span>連接 Google Sheets...</span></div>
       <div id="sales-error" class="error-msg" style="display:none;"></div>
-
       <div id="sales-content" style="display:none;">
-        <!-- Metrics -->
         <div class="metrics-grid">
-          <div class="metric-card">
-            <div class="metric-label">總收入</div>
-            <div class="metric-value" id="s-revenue">—</div>
-            <div class="metric-sub" id="s-revenue-sub"></div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">總利潤</div>
-            <div class="metric-value green" id="s-profit">—</div>
-            <div class="metric-sub" id="s-profit-sub"></div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">交易筆數</div>
-            <div class="metric-value" id="s-count">—</div>
-            <div class="metric-sub" id="s-count-sub"></div>
-          </div>
-          <div class="metric-card">
-            <div class="metric-label">平均利潤/件</div>
-            <div class="metric-value" id="s-avg">—</div>
-            <div class="metric-sub" id="s-avg-sub"></div>
-          </div>
+          <div class="metric-card"><div class="metric-label">總收入</div><div class="metric-value" id="s-revenue">—</div><div class="metric-sub" id="s-revenue-sub"></div></div>
+          <div class="metric-card"><div class="metric-label">總利潤</div><div class="metric-value green" id="s-profit">—</div><div class="metric-sub" id="s-profit-sub"></div></div>
+          <div class="metric-card"><div class="metric-label">交易筆數</div><div class="metric-value" id="s-count">—</div><div class="metric-sub" id="s-count-sub"></div></div>
+          <div class="metric-card"><div class="metric-label">平均利潤/件</div><div class="metric-value" id="s-avg">—</div><div class="metric-sub" id="s-avg-sub"></div></div>
         </div>
-
-        <!-- Charts -->
         <div class="chart-row">
           <div class="card">
-            <div class="card-header">
-              <div class="card-title" id="chart-title">利潤趨勢</div>
-            </div>
-            <div class="card-body">
-              <div class="bar-chart-wrap">
-                <div class="chart-bars" id="profit-bars"></div>
-              </div>
-            </div>
+            <div class="card-header"><div class="card-title" id="chart-title">利潤趨勢</div></div>
+            <div class="card-body"><div class="chart-bars" id="profit-bars"></div></div>
           </div>
           <div class="card">
             <div class="card-header"><div class="card-title">平台利潤佔比</div></div>
-            <div class="card-body">
-              <div class="platform-list" id="platform-list"></div>
-            </div>
+            <div class="card-body"><div class="platform-list" id="platform-list"></div></div>
           </div>
         </div>
-
-        <!-- Table -->
         <div class="card">
           <div class="card-header">
-            <div class="card-title">交易紀錄</div>
+            <span class="card-title">交易紀錄</span>
             <div class="search-wrap">
               <span class="search-icon">🔍</span>
               <input class="search-input" id="sales-search" placeholder="搜尋品名、買家..." oninput="renderSalesTable()">
@@ -423,18 +278,7 @@
           </div>
           <div class="table-wrap">
             <table>
-              <thead>
-                <tr>
-                  <th>狀態</th>
-                  <th>品名</th>
-                  <th>網站</th>
-                  <th>買家</th>
-                  <th>賣出日期</th>
-                  <th>實收</th>
-                  <th>成本</th>
-                  <th>利潤</th>
-                </tr>
-              </thead>
+              <thead><tr><th>狀態</th><th>品名</th><th>網站</th><th>買家</th><th>賣出日期</th><th>實收</th><th>成本</th><th>利潤</th></tr></thead>
               <tbody id="sales-tbody"></tbody>
             </table>
             <div id="sales-empty" class="empty-state" style="display:none;">沒有符合條件的資料</div>
@@ -442,161 +286,277 @@
         </div>
       </div>
     </div>
-
   </main>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">編輯商品資訊</div>
+      <button class="modal-close" onclick="closeModal('editModal')">✕</button>
+    </div>
+    <div id="edit-auth-notice" class="auth-notice" style="display:none;">
+      ⚠️ 尚未登入 Google。儲存後只更新本頁顯示，重新整理後會還原。請點左側「登入以啟用編輯」來串接試算表。
+    </div>
+    <div class="item-name-preview" id="edit-item-name"></div>
+    <div class="form-group">
+      <label class="form-label">狀態</label>
+      <select class="form-select" id="edit-status" onchange="toggleSaleFields()">
+        <option value="在庫">在庫</option>
+        <option value="自用">自用</option>
+        <option value="已售出">已售出</option>
+        <option value="出清">出清</option>
+      </select>
+    </div>
+    <div id="edit-sale-fields">
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">實收金額 (NT$)</label>
+          <input class="form-input" id="edit-received" type="number" placeholder="0" oninput="updateProfitPreview()">
+        </div>
+        <div class="form-group">
+          <label class="form-label">賣出日期</label>
+          <input class="form-input" id="edit-saledate" type="text" placeholder="2024/06">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">誰買</label>
+        <input class="form-input" id="edit-buyer" type="text" placeholder="蝦皮 / 面交 / 買家姓名">
+      </div>
+      <div class="profit-preview">
+        <span class="profit-label">預估利潤（實收 − 成本）</span>
+        <span class="profit-value" id="edit-profit-preview">—</span>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="save-status" id="edit-save-status"></div>
+      <button class="btn-outline" onclick="closeModal('editModal')">取消</button>
+      <button class="btn-accent" onclick="saveEdit()">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="modal-overlay" id="addModal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">新增商品</div>
+      <button class="modal-close" onclick="closeModal('addModal')">✕</button>
+    </div>
+    <div id="add-auth-notice" class="auth-notice" style="display:none;">
+      ⚠️ 尚未登入 Google。新增後只在本頁顯示，重新整理後會消失。請點左側「登入以啟用編輯」來串接試算表。
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">狀態</label>
+        <select class="form-select" id="add-status">
+          <option value="在庫">在庫</option><option value="自用">自用</option>
+          <option value="已售出">已售出</option><option value="出清">出清</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">網站</label>
+        <input class="form-input" id="add-site" type="text" placeholder="Amazon / Rakuten...">
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">品名 *</label>
+      <input class="form-input" id="add-name" type="text" placeholder="商品完整名稱">
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">尺寸</label>
+        <input class="form-input" id="add-size" type="text" placeholder="M / L / F">
+      </div>
+      <div class="form-group">
+        <label class="form-label">顏色</label>
+        <input class="form-input" id="add-color" type="text" placeholder="黑 / 藍">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">代購購買日</label>
+        <input class="form-input" id="add-date" type="text" placeholder="2024/01/15">
+      </div>
+      <div class="form-group">
+        <label class="form-label">台灣到貨日</label>
+        <input class="form-input" id="add-arrival" type="text" placeholder="2024/02/01">
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">台幣成本 (NT$)</label>
+        <input class="form-input" id="add-cost" type="number" placeholder="0">
+      </div>
+      <div class="form-group">
+        <label class="form-label">持有人</label>
+        <input class="form-input" id="add-holder" type="text" placeholder="Wayne / Joyce">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="save-status" id="add-save-status"></div>
+      <button class="btn-outline" onclick="closeModal('addModal')">取消</button>
+      <button class="btn-accent" onclick="saveAdd()">新增</button>
+    </div>
+  </div>
 </div>
 
 <script>
 // ============================================================
-// CONFIG — 修改這裡的 SHEET_ID 和分頁名稱
+// CONFIG — 只需修改這裡
 // ============================================================
-const SHEET_ID = '1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o';
-const SHEET_NAME = '2021-26'; // 交易記錄分頁名稱
+const SHEET_ID   = '1YSeEqQG6-jzU7MYPXih93922oblhHpL1bnmc0oUKi2o';
+const SHEET_NAME = '2021-26';
+// 如果要串接 Google Sheets API 寫入，請填入你的 Google OAuth Client ID
+// 申請方式：console.cloud.google.com → 建立專案 → API → Sheets API → 憑證 → OAuth 用戶端 ID
+const GOOGLE_CLIENT_ID = ''; // 填入後登入功能才能使用
 // ============================================================
 
-let allData = [];
-let invFilter = 'all';
-
-// 狀態分類
-const INV_STATUSES = ['在庫', '自用'];
+const INV_STATUSES  = ['在庫', '自用'];
 const SOLD_STATUSES = ['已售出', '出清'];
 
-function csvUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+let allData    = [];
+let invFilter  = 'all';
+let editIndex  = -1;
+let accessToken = null;
+
+// ---- AUTH ----
+function handleAuth() {
+  if (!GOOGLE_CLIENT_ID) {
+    alert('請先在程式碼頂部填入 GOOGLE_CLIENT_ID 才能使用登入功能。');
+    return;
+  }
+  if (accessToken) {
+    google.accounts.oauth2.revoke(accessToken, () => {
+      accessToken = null;
+      document.getElementById('authBtn').classList.remove('signed-in');
+      document.getElementById('authBtnText').textContent = '登入以啟用編輯';
+    });
+    return;
+  }
+  google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'https://www.googleapis.com/auth/spreadsheets',
+    callback: (resp) => {
+      if (resp.access_token) {
+        accessToken = resp.access_token;
+        document.getElementById('authBtn').classList.add('signed-in');
+        document.getElementById('authBtnText').textContent = '✓ 已登入 · 點此登出';
+      }
+    }
+  }).requestAccessToken();
 }
 
-// Simple CSV parser (handles quoted fields)
+// ---- DATA ----
+async function loadData() {
+  showLoading(true);
+  try {
+    const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_NAME)}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    allData = parseCSV(await res.text()).map(mapRow).filter(r => r.name);
+    document.getElementById('lastSync').textContent = new Date().toLocaleTimeString('zh-TW');
+    showLoading(false);
+    renderAll();
+  } catch(e) {
+    showLoading(false, e.message);
+  }
+}
+
 function parseCSV(text) {
   const lines = text.trim().split('\n');
-  if (lines.length < 2) return [];
-  const headers = parseCsvRow(lines[1]); // row 2 = column headers (row 1 = section labels)
   const rows = [];
   for (let i = 2; i < lines.length; i++) {
     if (!lines[i].trim()) continue;
     const vals = parseCsvRow(lines[i]);
-    if (vals.length < 2 || !vals[0]) continue;
-    const obj = {};
-    headers.forEach((h, idx) => { obj[h] = (vals[idx] || '').trim(); });
-    obj['_raw'] = vals;
-    rows.push(obj);
+    if (!vals[0] && !vals[3]) continue;
+    rows.push({ _vals: vals, _sheetRow: i + 1 });
   }
   return rows;
 }
 
 function parseCsvRow(line) {
-  const result = [];
-  let cur = '';
-  let inQuote = false;
-  for (let i = 0; i < line.length; i++) {
-    const c = line[i];
-    if (c === '"') {
-      if (inQuote && line[i+1] === '"') { cur += '"'; i++; }
-      else { inQuote = !inQuote; }
-    } else if (c === ',' && !inQuote) {
-      result.push(cur); cur = '';
-    } else { cur += c; }
+  const out=[]; let cur=''; let q=false;
+  for(let i=0;i<line.length;i++){
+    const c=line[i];
+    if(c==='"'){if(q&&line[i+1]==='"'){cur+='"';i++;}else{q=!q;}}
+    else if(c===','&&!q){out.push(cur);cur='';}
+    else{cur+=c;}
   }
-  result.push(cur);
-  return result;
+  out.push(cur);
+  return out;
 }
 
-function cleanNT(str) {
-  if (!str) return 0;
-  const s = str.replace(/NT\$|,|\s/g, '').replace('−','-').replace('–','-');
-  const n = parseFloat(s);
+function cleanNT(s) {
+  if (!s) return 0;
+  const n = parseFloat(s.replace(/[NT\$¥,\s]/g,'').replace(/[−–]/g,'-'));
   return isNaN(n) ? 0 : n;
 }
 
 function fmtNT(n) {
-  if (isNaN(n)) return '—';
-  const abs = Math.abs(Math.round(n));
-  return (n < 0 ? '-' : '') + 'NT$' + abs.toLocaleString('zh-TW');
+  if (n===null||n===undefined||isNaN(n)) return '—';
+  return (n<0?'-':'')+'NT$'+Math.abs(Math.round(n)).toLocaleString('zh-TW');
 }
 
-// Map row object from CSV columns
 function mapRow(obj) {
-  const vals = obj['_raw'] || [];
+  const v = obj._vals;
+  const saleDateRaw = (v[14]||'').trim();
+  // Parse year/month from sale date string directly (more reliable than using Y/Z cols)
+  let saleYear='', saleMonth='';
+  const m = saleDateRaw.match(/^(\d{4})[\/\-](\d{1,2})/);
+  if (m) { saleYear=m[1]; saleMonth=String(parseInt(m[2],10)); }
+
   return {
-    status: (vals[0] || '').trim(),
-    date: (vals[1] || '').trim(),
-    site: (vals[2] || '').trim(),
-    name: (vals[3] || '').trim(),
-    size: (vals[4] || '').trim(),
-    color: (vals[5] || '').trim(),
-    weight: (vals[6] || '').trim(),
-    shipping: (vals[7] || '').trim(),
-    priceForeign: (vals[8] || '').trim(),
-    priceNT: cleanNT(vals[9] || ''),
-    splitShipping: cleanNT(vals[10] || ''),
-    arrivalDate: (vals[11] || '').trim(),
-    received: cleanNT(vals[12] || ''),
-    buyer: (vals[13] || '').trim(),
-    saleDate: (vals[14] || '').trim(),
-    profit: cleanNT(vals[15] || ''),
-    month: (vals[24] || '').trim(),
-    year: (vals[25] || '').trim(),
+    _sheetRow: obj._sheetRow,
+    status:      (v[0] ||'').trim(),
+    date:        (v[1] ||'').trim(),
+    site:        (v[2] ||'').trim(),
+    name:        (v[3] ||'').trim(),
+    size:        (v[4] ||'').trim(),
+    color:       (v[5] ||'').trim(),
+    arrivalDate: (v[11]||'').trim(),
+    priceNT:     cleanNT(v[9] ||''),
+    splitShip:   cleanNT(v[10]||''),
+    received:    cleanNT(v[12]||''),
+    buyer:       (v[13]||'').trim(),
+    saleDate:    saleDateRaw,
+    profit:      cleanNT(v[15]||''),
+    saleYear, saleMonth,
   };
 }
 
-async function loadData() {
-  showLoading(true);
-  try {
-    const url = csvUrl(SHEET_NAME);
-    const res = await fetch(url);
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const text = await res.text();
-    const parsed = parseCSV(text);
-    allData = parsed.map(mapRow).filter(r => r.status && r.name);
-
-    const now = new Date().toLocaleString('zh-TW');
-    document.getElementById('lastSync').textContent = `更新：${now}`;
-
-    showLoading(false);
-    renderAll();
-  } catch (e) {
-    showLoading(false, e.message);
-  }
-}
-
-function showLoading(loading, errMsg) {
+function showLoading(loading, err) {
   ['inv','sales'].forEach(p => {
-    document.getElementById(`${p}-loading`).style.display = loading ? 'flex' : 'none';
-    document.getElementById(`${p}-error`).style.display = (!loading && errMsg) ? 'block' : 'none';
-    document.getElementById(`${p}-content`).style.display = (!loading && !errMsg) ? 'block' : 'none';
-    if (errMsg) {
-      document.getElementById(`${p}-error`).innerHTML =
-        `⚠️ 無法讀取試算表資料<br><br>` +
-        `需要額外將試算表「發布到網路」才能讓 dashboard 讀取：<br><br>` +
-        `1. 開啟試算表 → 點「檔案」→「共用」→「發布到網路」<br>` +
-        `2. 選「整份文件」+「逗號分隔值 (.csv)」<br>` +
-        `3. 按「發布」→「確定」<br><br>` +
-        `<a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}" target="_blank" style="color:var(--accent);">點此開啟試算表</a>`;
-    }
+    document.getElementById(`${p}-loading`).style.display = loading?'flex':'none';
+    document.getElementById(`${p}-error`).style.display = (!loading&&err)?'block':'none';
+    document.getElementById(`${p}-content`).style.display = (!loading&&!err)?'block':'none';
+    if(err) document.getElementById(`${p}-error`).innerHTML =
+      `⚠️ 無法讀取資料：${err}<br><br>
+      請確認試算表已「發布到網路」：<br>
+      檔案 → 共用 → 發布到網路 → 整份文件 → .csv → 發布<br><br>
+      <a href="https://docs.google.com/spreadsheets/d/${SHEET_ID}" target="_blank" style="color:var(--danger);font-weight:500;">點此開啟試算表</a>`;
   });
 }
 
-function renderAll() {
-  renderInventory();
-  renderSalesCharts();
-  renderSalesTable();
-}
+function renderAll() { renderInventory(); renderSalesCharts(); }
 
 // ---- INVENTORY ----
 function getInvData() {
-  return allData.filter(r => INV_STATUSES.some(s => r.status.includes(s)));
+  return allData.filter(r => INV_STATUSES.includes(r.status));
 }
 
 function renderInventory() {
   const data = getInvData();
   document.getElementById('inv-subtitle').textContent = `共 ${data.length} 件商品在追蹤中`;
-  document.getElementById('inv-count-unsold').textContent = data.filter(r => r.status.includes('在庫')).length;
-  document.getElementById('inv-count-self').textContent = data.filter(r => r.status.includes('自用')).length;
+  document.getElementById('inv-count-stock').textContent = data.filter(r=>r.status==='在庫').length;
+  document.getElementById('inv-count-self').textContent  = data.filter(r=>r.status==='自用').length;
   renderInvTable();
 }
 
 function filterInv(status, btn) {
   invFilter = status;
-  document.querySelectorAll('#page-inventory .filter-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('#page-inventory .filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderInvTable();
 }
@@ -604,166 +564,292 @@ function filterInv(status, btn) {
 function renderInvTable() {
   const q = document.getElementById('inv-search').value.toLowerCase();
   let data = getInvData();
-  if (invFilter !== 'all') data = data.filter(r => r.status.includes(invFilter));
-  if (q) data = data.filter(r => r.name.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q) || r.site.toLowerCase().includes(q));
+  if (invFilter!=='all') data = data.filter(r=>r.status===invFilter);
+  if (q) data = data.filter(r=>
+    r.name.toLowerCase().includes(q)||r.site.toLowerCase().includes(q)||
+    r.color.toLowerCase().includes(q)||r.buyer.toLowerCase().includes(q)
+  );
+
+  const countEl = document.getElementById('inv-count-label');
+  countEl.textContent = q ? `找到 ${data.length} 件` : `共 ${data.length} 件`;
 
   const tbody = document.getElementById('inv-tbody');
   const empty = document.getElementById('inv-empty');
-  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
+  if (!data.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
   empty.style.display = 'none';
 
   tbody.innerHTML = data.map(r => {
-    const cost = r.priceNT + r.splitShipping;
-    return `<tr>
-      <td>${statusBadge(r.status)}</td>
+    const cost = r.priceNT + r.splitShip;
+    const idx  = allData.indexOf(r);
+    return `<tr class="clickable" onclick="openEditModal(${idx})">
+      <td>${badge(r.status)}</td>
       <td><div class="name-cell" title="${r.name}">${r.name}</div></td>
-      <td>${r.site || '—'}</td>
-      <td>${r.size || '—'}</td>
-      <td>${r.color || '—'}</td>
-      <td class="mono">${r.date || '—'}</td>
-      <td class="mono">${r.arrivalDate || '—'}</td>
-      <td class="mono">${cost > 0 ? fmtNT(cost) : '—'}</td>
-      <td>${r.buyer || '—'}</td>
+      <td>${r.site||'—'}</td><td>${r.size||'—'}</td><td>${r.color||'—'}</td>
+      <td class="mono">${r.date||'—'}</td>
+      <td class="mono">${r.arrivalDate||'—'}</td>
+      <td class="mono">${cost>0?fmtNT(cost):'—'}</td>
+      <td>${r.buyer||'—'}</td>
     </tr>`;
   }).join('');
 }
 
 // ---- SALES ----
 function getSalesData() {
-  const year = document.getElementById('year-select')?.value || 'all';
-  let data = allData.filter(r => SOLD_STATUSES.some(s => r.status.includes(s)));
-  if (year !== 'all') data = data.filter(r => r.year === year || r.saleDate.startsWith(year));
+  const year = document.getElementById('year-select')?.value||'all';
+  let data = allData.filter(r=>SOLD_STATUSES.includes(r.status));
+  if (year!=='all') data = data.filter(r=>r.saleYear===year);
   return data;
 }
 
 function renderSalesCharts() {
   const data = getSalesData();
-  const year = document.getElementById('year-select')?.value || 'all';
-
-  // Metrics
-  const totalRevenue = data.reduce((s, r) => s + r.received, 0);
-  const totalProfit = data.reduce((s, r) => s + r.profit, 0);
+  const year = document.getElementById('year-select')?.value||'all';
+  const totalRev  = data.reduce((s,r)=>s+r.received,0);
+  const totalProf = data.reduce((s,r)=>s+r.profit,0);
   const count = data.length;
-  const avg = count ? Math.round(totalProfit / count) : 0;
 
-  document.getElementById('s-revenue').textContent = fmtNT(totalRevenue);
+  document.getElementById('s-revenue').textContent     = fmtNT(totalRev);
   document.getElementById('s-revenue-sub').textContent = `${count} 筆交易`;
-  document.getElementById('s-profit').textContent = fmtNT(totalProfit);
-  document.getElementById('s-profit-sub').textContent = `利潤率 ${totalRevenue ? Math.round(totalProfit/totalRevenue*100) : 0}%`;
-  document.getElementById('s-count').textContent = count;
-  document.getElementById('s-count-sub').textContent = year === 'all' ? '2021–2026' : year + '年';
-  document.getElementById('s-avg').textContent = fmtNT(avg);
-  document.getElementById('s-avg-sub').textContent = '每筆平均';
+  document.getElementById('s-profit').textContent      = fmtNT(totalProf);
+  document.getElementById('s-profit-sub').textContent  = `利潤率 ${totalRev?Math.round(totalProf/totalRev*100):0}%`;
+  document.getElementById('s-count').textContent       = count;
+  document.getElementById('s-count-sub').textContent   = year==='all'?'2021–2026':year+'年';
+  document.getElementById('s-avg').textContent         = count?fmtNT(Math.round(totalProf/count)):'—';
+  document.getElementById('s-avg-sub').textContent     = '每筆平均';
+  document.getElementById('sales-subtitle').textContent= `${year==='all'?'全部':year+'年'} · 共 ${count} 筆`;
 
-  document.getElementById('sales-subtitle').textContent = `${year === 'all' ? '全部' : year + '年'} · 共 ${count} 筆交易`;
-
-  // Bar chart (monthly if single year, else yearly)
+  // Bar chart — fix: parse month directly from saleDate
   const barsEl = document.getElementById('profit-bars');
-  if (year !== 'all') {
+  if (year!=='all') {
     document.getElementById('chart-title').textContent = `${year} 年每月利潤`;
     const monthly = Array(12).fill(0);
     data.forEach(r => {
-      const m = parseInt(r.month) - 1;
-      if (m >= 0 && m < 12) monthly[m] += r.profit;
+      const mo = parseInt(r.saleMonth, 10);
+      if (mo>=1&&mo<=12) monthly[mo-1] += r.profit;
     });
-    const labels = ['1','2','3','4','5','6','7','8','9','10','11','12'];
-    renderBars(barsEl, monthly, labels, '月');
+    renderBars(barsEl, monthly, ['1','2','3','4','5','6','7','8','9','10','11','12'], '月');
   } else {
     document.getElementById('chart-title').textContent = '每年利潤總覽';
-    const years = ['2021','2022','2023','2024','2025','2026'];
-    const yearly = years.map(y => {
-      return data.filter(r => r.year === y || r.saleDate.startsWith(y)).reduce((s,r) => s+r.profit, 0);
-    });
-    renderBars(barsEl, yearly, years, '');
+    const yrs = ['2021','2022','2023','2024','2025','2026'];
+    renderBars(barsEl, yrs.map(y=>data.filter(r=>r.saleYear===y).reduce((s,r)=>s+r.profit,0)), yrs, '');
   }
 
-  // Platform chart - by profit total
-  const platforms = {};
-  data.forEach(r => {
-    const p = normalizePlatform(r.buyer);
-    platforms[p] = (platforms[p] || 0) + r.profit;
-  });
-  const sorted = Object.entries(platforms).sort((a,b) => b[1]-a[1]).slice(0,6);
-  const maxVal = Math.max(...sorted.map(s => Math.abs(s[1])), 1);
-  document.getElementById('platform-list').innerHTML = sorted.map(([name, prof]) => `
+  // Platform
+  const plat = {};
+  data.forEach(r=>{ const p=normPlatform(r.buyer); plat[p]=(plat[p]||0)+r.profit; });
+  const sorted = Object.entries(plat).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxV = Math.max(...sorted.map(s=>Math.abs(s[1])),1);
+  document.getElementById('platform-list').innerHTML = sorted.map(([name,prof])=>`
     <div class="platform-row">
       <div class="platform-name">${name}</div>
-      <div class="platform-bar-wrap"><div class="platform-bar" style="width:${Math.round(Math.abs(prof)/maxVal*100)}%;background:${prof<0?'var(--danger)':'var(--accent)'};"></div></div>
+      <div class="platform-bar-wrap"><div class="platform-bar" style="width:${Math.round(Math.abs(prof)/maxV*100)}%;background:${prof<0?'var(--danger)':'var(--accent)'}"></div></div>
       <div class="platform-val" style="color:${prof<0?'var(--danger)':'var(--text2)'}">${fmtNT(prof)}</div>
     </div>`).join('');
 
   renderSalesTable();
 }
 
-function normalizePlatform(buyer) {
-  if (!buyer) return '其他';
-  if (buyer.includes('蝦皮') || buyer.toLowerCase().includes('shopee')) return '蝦皮';
-  if (buyer.includes('FB') || buyer.includes('好賣')) return 'FB/好賣+';
-  return buyer.length > 5 ? buyer.slice(0,5) : buyer;
-}
-
-function renderBars(el, values, labels, unit) {
-  const max = Math.max(...values, 1);
-  el.innerHTML = values.map((v, i) => {
-    const h = Math.max(Math.round((v / max) * 100), v !== 0 ? 2 : 0);
-    const color = v >= 0 ? '#2D5F3F' : '#B83232';
-    const display = Math.abs(v) >= 1000 ? (v/1000).toFixed(1)+'k' : Math.round(v);
+function renderBars(el, vals, labels, unit) {
+  const absMax = Math.max(...vals.map(Math.abs), 1);
+  el.innerHTML = vals.map((v,i)=>{
+    const h = Math.max(Math.round(Math.abs(v)/absMax*100), v!==0?3:0);
+    const col = v>=0?'#2D5F3F':'#B83232';
+    const disp = Math.abs(v)>=1000?(v/1000).toFixed(1)+'k':Math.round(v);
     return `<div class="chart-bar-col">
-      <div class="chart-bar-val">${display}</div>
-      <div class="chart-bar" style="height:${h}px;background:${color};opacity:${v<0?0.6:0.85};"></div>
+      <div class="chart-bar-val" style="color:${v<0?'var(--danger)':'var(--text2)'}">${v!==0?disp:''}</div>
+      <div class="chart-bar" style="height:${h}px;background:${col};opacity:.85;"></div>
       <div class="chart-bar-lbl">${labels[i]}${unit}</div>
     </div>`;
   }).join('');
 }
 
 function renderSalesTable() {
-  const q = document.getElementById('sales-search')?.value.toLowerCase() || '';
+  const q = (document.getElementById('sales-search')?.value||'').toLowerCase();
   let data = getSalesData();
-  if (q) data = data.filter(r => r.name.toLowerCase().includes(q) || r.buyer.toLowerCase().includes(q));
-
+  if (q) data = data.filter(r=>r.name.toLowerCase().includes(q)||r.buyer.toLowerCase().includes(q));
+  data = [...data].sort((a,b)=>b.saleDate.localeCompare(a.saleDate));
   const tbody = document.getElementById('sales-tbody');
   const empty = document.getElementById('sales-empty');
-  if (!data.length) { tbody.innerHTML = ''; empty.style.display = 'block'; return; }
-  empty.style.display = 'none';
-
-  // Sort by sale date descending
-  data = [...data].sort((a,b) => b.saleDate.localeCompare(a.saleDate));
-
-  tbody.innerHTML = data.map(r => {
-    const cost = r.priceNT + r.splitShipping;
-    const profitClass = r.profit >= 0 ? 'pos' : 'neg';
+  if (!data.length) { tbody.innerHTML=''; empty.style.display='block'; return; }
+  empty.style.display='none';
+  tbody.innerHTML = data.map(r=>{
+    const cost = r.priceNT+r.splitShip;
     return `<tr>
-      <td>${statusBadge(r.status)}</td>
-      <td><div class="name-cell" title="${r.name}">${r.name}</div></td>
-      <td>${r.site || '—'}</td>
-      <td>${r.buyer || '—'}</td>
-      <td class="mono">${r.saleDate || '—'}</td>
-      <td class="mono">${r.received ? fmtNT(r.received) : '—'}</td>
-      <td class="mono">${cost > 0 ? fmtNT(cost) : '—'}</td>
-      <td class="mono ${profitClass}">${fmtNT(r.profit)}</td>
+      <td>${badge(r.status)}</td>
+      <td><div class="name-plain" title="${r.name}">${r.name}</div></td>
+      <td>${r.site||'—'}</td><td>${r.buyer||'—'}</td>
+      <td class="mono">${r.saleDate||'—'}</td>
+      <td class="mono">${r.received?fmtNT(r.received):'—'}</td>
+      <td class="mono">${cost>0?fmtNT(cost):'—'}</td>
+      <td class="mono ${r.profit>=0?'pos':'neg'}">${fmtNT(r.profit)}</td>
     </tr>`;
   }).join('');
 }
 
-function statusBadge(status) {
-  if (!status) return '';
-  if (status.includes('已售出')) return `<span class="badge badge-sold">已售出</span>`;
-  if (status.includes('自用')) return `<span class="badge badge-self">自用</span>`;
-  if (status.includes('出清')) return `<span class="badge badge-clear">出清</span>`;
-  if (status.includes('預購中')) return `<span class="badge badge-pending">預購中</span>`;
-  if (status.includes('在庫')) return `<span class="badge badge-unsold">在庫</span>`;
-  if (status.includes('未售出')) return `<span class="badge badge-unsold">未售出</span>`;
-  return `<span class="badge" style="background:var(--surface2);color:var(--text2);">${status}</span>`;
+function normPlatform(buyer) {
+  if (!buyer) return '其他';
+  if (buyer.includes('蝦皮')||buyer.toLowerCase().includes('shopee')) return '蝦皮';
+  if (buyer.includes('FB')||buyer.includes('好賣')) return 'FB/好賣+';
+  return buyer.length>6?buyer.slice(0,6):buyer;
 }
 
-function showPage(name) {
-  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+function badge(s) {
+  if (!s) return '';
+  const map = { '已售出':'badge-sold','自用':'badge-self','出清':'badge-clear','在庫':'badge-instock' };
+  const cls = map[s]||'';
+  return `<span class="badge ${cls}">${s}</span>`;
+}
+
+// ---- MODALS ----
+function openModal(id){ document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); document.body.style.overflow=''; }
+document.querySelectorAll('.modal-overlay').forEach(el=>el.addEventListener('click',e=>{if(e.target===el)closeModal(el.id);}));
+
+// EDIT MODAL
+function openEditModal(idx) {
+  const r = allData[idx]; if (!r) return;
+  editIndex = idx;
+  document.getElementById('edit-item-name').textContent = `📦 ${r.name}`;
+  document.getElementById('edit-status').value   = r.status;
+  document.getElementById('edit-received').value = r.received||'';
+  document.getElementById('edit-saledate').value = r.saleDate||'';
+  document.getElementById('edit-buyer').value    = r.buyer||'';
+  document.getElementById('edit-auth-notice').style.display = accessToken?'none':'block';
+  document.getElementById('edit-save-status').textContent = '';
+  document.getElementById('edit-save-status').className = 'save-status';
+  toggleSaleFields();
+  updateProfitPreview();
+  openModal('editModal');
+}
+
+function toggleSaleFields() {
+  const s = document.getElementById('edit-status').value;
+  document.getElementById('edit-sale-fields').style.display =
+    (s==='已售出'||s==='出清') ? 'block' : 'none';
+}
+
+function updateProfitPreview() {
+  const r = allData[editIndex]; if (!r) return;
+  const received = parseFloat(document.getElementById('edit-received').value)||0;
+  const cost = r.priceNT+r.splitShip;
+  const profit = received-cost;
+  const el = document.getElementById('edit-profit-preview');
+  if (received>0) {
+    el.textContent = fmtNT(profit);
+    el.style.color = profit>=0?'var(--profit)':'var(--danger)';
+  } else { el.textContent='—'; el.style.color='var(--text2)'; }
+}
+
+async function saveEdit() {
+  const r = allData[editIndex]; if (!r) return;
+  const statusEl    = document.getElementById('edit-save-status');
+  const newStatus   = document.getElementById('edit-status').value;
+  const newReceived = parseFloat(document.getElementById('edit-received').value)||0;
+  const newSaleDate = document.getElementById('edit-saledate').value;
+  const newBuyer    = document.getElementById('edit-buyer').value;
+  const cost        = r.priceNT+r.splitShip;
+  const newProfit   = newReceived>0 ? newReceived-cost : r.profit;
+  const saleDateParsed = newSaleDate.match(/^(\d{4})[\/\-](\d{1,2})/);
+
+  // Update local
+  allData[editIndex] = {
+    ...r, status:newStatus, received:newReceived, saleDate:newSaleDate, buyer:newBuyer,
+    profit:newProfit,
+    saleYear: saleDateParsed?saleDateParsed[1]:'',
+    saleMonth: saleDateParsed?String(parseInt(saleDateParsed[2],10)):'',
+  };
+
+  if (accessToken) {
+    statusEl.textContent='儲存中...'; statusEl.className='save-status';
+    try {
+      const row = r._sheetRow;
+      const body = {
+        valueInputOption:'USER_ENTERED',
+        data:[
+          {range:`${SHEET_NAME}!A${row}`, values:[[newStatus]]},
+          {range:`${SHEET_NAME}!M${row}`, values:[[newReceived?`NT$${newReceived}`:'0']]},
+          {range:`${SHEET_NAME}!N${row}`, values:[[newBuyer]]},
+          {range:`${SHEET_NAME}!O${row}`, values:[[newSaleDate]]},
+        ]
+      };
+      const res = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values:batchUpdate`,
+        {method:'POST',headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},body:JSON.stringify(body)}
+      );
+      if (!res.ok) throw new Error(`Sheets API ${res.status}`);
+      statusEl.textContent='✓ 已儲存到試算表'; statusEl.className='save-status ok';
+    } catch(e) {
+      statusEl.textContent=`✕ 儲存失敗：${e.message}`; statusEl.className='save-status err';
+    }
+  } else {
+    statusEl.textContent='✓ 本頁已更新（未登入 Google，不會存回試算表）';
+    statusEl.className='save-status';
+  }
+  renderInventory(); renderSalesCharts();
+}
+
+// ADD MODAL
+function openAddModal() {
+  ['add-name','add-site','add-size','add-color','add-date','add-arrival','add-cost','add-holder']
+    .forEach(id=>document.getElementById(id).value='');
+  document.getElementById('add-status').value='在庫';
+  document.getElementById('add-auth-notice').style.display = accessToken?'none':'block';
+  document.getElementById('add-save-status').textContent='';
+  openModal('addModal');
+}
+
+async function saveAdd() {
+  const name = document.getElementById('add-name').value.trim();
+  if (!name) { alert('請填寫品名'); return; }
+  const statusEl = document.getElementById('add-save-status');
+  const newRow = {
+    _sheetRow: allData.length+3,
+    status:      document.getElementById('add-status').value,
+    site:        document.getElementById('add-site').value.trim(),
+    name,
+    size:        document.getElementById('add-size').value.trim(),
+    color:       document.getElementById('add-color').value.trim(),
+    date:        document.getElementById('add-date').value.trim(),
+    arrivalDate: document.getElementById('add-arrival').value.trim(),
+    priceNT:     parseFloat(document.getElementById('add-cost').value)||0,
+    buyer:       document.getElementById('add-holder').value.trim(),
+    splitShip:0, received:0, profit:0, saleDate:'', saleYear:'', saleMonth:'',
+  };
+  allData.push(newRow);
+
+  if (accessToken) {
+    statusEl.textContent='儲存中...';
+    try {
+      const rowData = [
+        newRow.status, newRow.date, newRow.site, newRow.name, newRow.size,
+        newRow.color, '', '', '', newRow.priceNT?`NT$${newRow.priceNT}`:'',
+        '', newRow.arrivalDate, '', newRow.buyer, '', ''
+      ];
+      const res = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/${encodeURIComponent(SHEET_NAME)}!A:P:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`,
+        {method:'POST',headers:{Authorization:`Bearer ${accessToken}`,'Content-Type':'application/json'},body:JSON.stringify({values:[rowData]})}
+      );
+      if (!res.ok) throw new Error(`Sheets API ${res.status}`);
+      statusEl.textContent='✓ 已新增到試算表'; statusEl.className='save-status ok';
+      setTimeout(()=>closeModal('addModal'),1200);
+    } catch(e) {
+      statusEl.textContent=`✕ 儲存失敗：${e.message}`; statusEl.className='save-status err';
+    }
+  } else {
+    statusEl.textContent='✓ 已新增（未登入 Google，不會存回試算表）';
+    statusEl.className='save-status';
+    setTimeout(()=>closeModal('addModal'),1000);
+  }
+  renderInventory();
+}
+
+function showPage(name, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById(`page-${name}`).classList.add('active');
-  event.currentTarget.classList.add('active');
+  btn.classList.add('active');
 }
 
-// Auto-load on start
 loadData();
 </script>
 </body>
